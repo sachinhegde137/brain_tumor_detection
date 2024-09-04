@@ -3,7 +3,6 @@ import random
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
 import cv2
 
 from src.utils import draw_boxes_from_labels, CLASS_NAMES

@@ -1,10 +1,7 @@
-import sys
-
 import numpy as np
 import tensorflow as tf
-import os
+
 import cv2
-from typing import Tuple, List, Any
 
 
 INPUT_SHAPE = (416, 416)

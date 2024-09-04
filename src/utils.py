@@ -2,12 +2,10 @@ import os
 import shutil
 from typing import List, Tuple, Any
 import cv2
+import uuid
 import tensorflow as tf
 from tensorflow.keras.callbacks import Callback
 from tensorflow.keras.layers import Lambda
-import random
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
 import numpy as np
 from src.models import ANCHOR_MASKS,ANCHORS, build_boxes, non_max_suppression
 
@@ -67,12 +65,12 @@ def draw_boxes_from_labels(image, labels, class_names):
     return image
 
 
-def make_eval_model_from_trained_model(model, anchors, masks, num_classes=10, tiny=True):
+def make_eval_model_from_trained_model(model, anchors, masks, num_classes=4, tiny=True):
     output_0, output_1, output_2 = model.outputs
 
-    boxes_0 = Lambda(lambda x: build_boxes(x, anchors[masks[0]], num_classes, False), name='yolo_boxes_0')(output_0)
-    boxes_1 = Lambda(lambda x: build_boxes(x, anchors[masks[1]], num_classes, False), name='yolo_boxes_1')(output_1)
-    boxes_2 = Lambda(lambda x: build_boxes(x, anchors[masks[2]], num_classes, False), name='yolo_boxes_1')(output_2)
+    boxes_0 = Lambda(lambda x: build_boxes(x, anchors[masks[0]], num_classes), name='yolo_boxes_0')(output_0)
+    boxes_1 = Lambda(lambda x: build_boxes(x, anchors[masks[1]], num_classes), name='yolo_boxes_1')(output_1)
+    boxes_2 = Lambda(lambda x: build_boxes(x, anchors[masks[2]], num_classes), name='yolo_boxes_2')(output_2)
     outputs = Lambda(lambda x: non_max_suppression(x, max_output_size=100, iou_threshold=0.5, confidence_threshold=0.5),
                      name='yolo_nms')((boxes_0[:3], boxes_1[:3], boxes_2[:3]))
     model = tf.keras.Model(model.inputs, outputs, name='yolov3')
@@ -103,7 +101,7 @@ class DataVisualizer(Callback):
         for batch, (images, labels) in enumerate(self.dataset):
             images = images.numpy()
             for i in range(images.shape[0]):
-                boxes, scores, classes = model.predict(images[i:i + 1, ...])
+                boxes, scores, classes, valid_detections = model.predict(images[i:i + 1, ...])
                 img_for_this = (images[i, ...] * 255).astype(np.uint8)
 
                 boxes_for_this, scores_for_this, classes_for_this = boxes[0, ...], scores[0, ...], classes[0, ...]

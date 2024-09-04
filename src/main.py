@@ -1,3 +1,4 @@
+import h5py
 import os
 from pathlib import Path
 
@@ -47,6 +48,8 @@ def create_dataset(dir_path: str) -> tf.data.Dataset:
 
 
 if __name__ == '__main__':
+    #f = h5py.File("/data/vera/run-2/hdfaa.001", "r")
+    print(h5py.__file__)
 
     project_dir = Path(__file__).parent.parent
 
@@ -66,11 +69,6 @@ if __name__ == '__main__':
     val_dataset = val_dataset.batch(batch_size=BATCH_SIZE)
     val_dataset = val_dataset.map(
         lambda x, y: (x, transform_targets(y, INPUT_SHAPE, ANCHORS, ANCHOR_MASKS, n_classes)))
-
-    train_dataset = train_dataset.skip(500)
-    val_dataset = val_dataset.skip(40)
-    print(f"The size of the training dataset: {len(list(train_dataset.as_numpy_iterator()))}")
-    print(f"The size of the validation dataset: {len(list(val_dataset.as_numpy_iterator()))}")
 
     model = YoloV3(
         n_classes=4,
@@ -95,6 +93,7 @@ if __name__ == '__main__':
     ]
 
     history = model.fit(train_dataset, epochs=EPOCHS, callbacks=callbacks, validation_data=val_dataset, verbose=True)
+    model.save(f"YoloV3_{INPUT_SHAPE[0]}x{INPUT_SHAPE[1]}")
 
 
 
