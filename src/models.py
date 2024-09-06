@@ -282,7 +282,7 @@ def broadcast_iou(box_1: tf.Tensor, box_2: tf.Tensor) -> Any:
 
 def loss_function(
         anchors: np.ndarray,
-        n_classes: int,
+        n_classes: int = 4,
         ignore_thresh: float = 0.5
 ) -> Any:
     """
@@ -355,8 +355,14 @@ class YoloV3:
     Yolo v3 model class.
     """
 
-    def __init__(self, n_classes, img_size, max_output_size, iou_threshold,
-                 confidence_threshold, trainable=False):
+    def __init__(
+            self,
+            n_classes: int,
+            img_size: Tuple[int, int],
+            max_output_size: int = 10,
+            iou_threshold: float = 0.5,
+            confidence_threshold: float = 0.5,
+            trainable: bool = False):
         """
         Creates the model.
 

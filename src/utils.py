@@ -12,6 +12,21 @@ from src.models import ANCHOR_MASKS,ANCHORS, build_boxes, non_max_suppression
 CLASS_NAMES = ["Glioma", "Meningioma", "No Tumour", "Pituitary"]
 
 
+def preprocess_image(image_path: str, input_shape: Tuple[int, int]):
+    """
+    Load and preprocess the image. Includes resizing and normalizing.
+    :param image_path: Path to image
+    :param input_shape: Shape of image
+    :return: Tuple of original image array and processed image array
+    """
+    orig_image = cv2.imread(image_path)
+    processed_image = cv2.cvtColor(orig_image, cv2.COLOR_BGR2RGB)
+    processed_image = cv2.resize(processed_image, input_shape)
+    processed_image = np.array(processed_image, dtype=np.float32) / 255.0  # Normalize
+    #image_array = np.expand_dims(image_array, axis=0)  # Add batch dimension
+    return orig_image, processed_image
+
+
 def draw_outputs(img, outputs, class_names=None):
     boxes, objectness, classes = outputs
     #boxes, objectness, classes = boxes[0], objectness[0], classes[0]

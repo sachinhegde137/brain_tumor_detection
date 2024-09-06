@@ -1,7 +1,7 @@
 import numpy as np
 import tensorflow as tf
 
-import cv2
+from src.utils import preprocess_image
 
 
 INPUT_SHAPE = (416, 416)
@@ -83,10 +83,12 @@ def transform_img_and_labels(image_path_tensor: tf.Tensor, label_path_tensor: tf
     image_path = bytes.decode(image_path_tensor.numpy())
     label_path = bytes.decode(label_path_tensor.numpy())
 
-    orig_image = cv2.imread(image_path)
-    image = cv2.cvtColor(orig_image, cv2.COLOR_BGR2RGB)
-    image = tf.image.resize(image, INPUT_SHAPE)
-    image_normalized = tf.cast(image, tf.float32) / 255.0
+    #orig_image = cv2.imread(image_path)
+    #image = cv2.cvtColor(orig_image, cv2.COLOR_BGR2RGB)
+    #image = tf.image.resize(image, INPUT_SHAPE)
+    #image_normalized = tf.cast(image, tf.float32) / 255.0
+    orig_image, image_normalized = preprocess_image(image_path=image_path, input_shape=INPUT_SHAPE)
+    image_normalized = tf.convert_to_tensor(image_normalized, dtype=tf.float32)
 
     with open(label_path, 'r') as file:
         raw_label_data = file.readlines()
