@@ -65,3 +65,30 @@ The model used in this project is based on the YOLOv3 architecture, which is a s
 - **End-to-End Learning:** YOLOv3 is an end-to-end learning model, meaning it can be trained directly on raw images and their corresponding annotations without needing to pre-process images into multiple scales or aspect ratios.
 
 Overall, YOLOv3's architecture is well-suited for the task of detecting brain tumors from MRI scans, offering a robust balance between speed and detection accuracy.
+
+
+## Installation
+To run this project locally, follow these steps:
+
+1. Clone this repository:
+   ```bash
+   git clone https://github.com/sachinhegde137/brain_tumor_detection.git
+   cd brain_tumor_detection
+
+2. Create a virtual environment and activate it:
+   ```bash
+   python -m venv my_env
+   source my_env/bin/activate  # On linux
+   venv\Scripts\activate  # On windows
+   
+3. Install the required dependencies:
+   ```bash
+   pip install -r requirements.txt
+   
+4. Download the dataset from this link: [MRI Dataset for Brain tumor detection](https://www.kaggle.com/datasets/ahmedsorour1/mri-for-brain-tumor-with-bounding-boxes).
+The dataset has 'Train' and 'Val' directories. Each of these directories contain 4 sub-directories corresponding to 4 classes.
+Place the 'Train' and 'Val' folders in the 'dataset' directory in the project directory.
+
+## Acknowledgements
+- This project is inspired by the original [YOLOv3 paper](https://arxiv.org/pdf/1804.02767) by Joseph Redmon and Ali Farhadi.
+- Thanks to the [dataset provider](https://www.kaggle.com/datasets/ahmedsorour1/mri-for-brain-tumor-with-bounding-boxes) for making the brain tumor dataset available.

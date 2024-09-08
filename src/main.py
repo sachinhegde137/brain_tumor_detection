@@ -13,7 +13,7 @@ INPUT_SHAPE = (416, 416)
 BATCH_SIZE = 8
 n_classes = 4
 LEARNING_RATE = 1e-3
-EPOCHS = 1
+EPOCHS = 10
 
 
 def create_dataset(dir_path: str) -> tf.data.Dataset:
