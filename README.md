@@ -89,6 +89,21 @@ To run this project locally, follow these steps:
 The dataset has 'Train' and 'Val' directories. Each of these directories contain 4 sub-directories corresponding to 4 classes.
 Place the 'Train' and 'Val' folders in the 'dataset' directory in the project directory.
 
+## Usage
+
+To train the model, run the following command:
+   ```bash
+   python src/main.py --train_path <path/to/train/dataset> --val_path <path/to/Val/dataset> --batch_size <batch size> --epochs <number of epochs> 
+   ```
+
+To test the model on new images, use:
+   ```bash
+   python src/detect.py --image_path <path/to/test_image> --model_path <path/to/model> --input_shape <input shape> 
+   ```
+
 ## Acknowledgements
 - This project is inspired by the original [YOLOv3 paper](https://arxiv.org/pdf/1804.02767) by Joseph Redmon and Ali Farhadi.
 - Thanks to the [dataset provider](https://www.kaggle.com/datasets/ahmedsorour1/mri-for-brain-tumor-with-bounding-boxes) for making the brain tumor dataset available.
+
+
+   

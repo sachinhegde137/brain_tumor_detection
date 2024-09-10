@@ -1,6 +1,9 @@
 import h5py
 import os
 from pathlib import Path
+import argparse
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.utils import DataVisualizer
 from src.models import YoloV3, ANCHORS, ANCHOR_MASKS, loss_function
@@ -10,10 +13,8 @@ import tensorflow as tf
 from tensorflow.keras.callbacks import ReduceLROnPlateau, EarlyStopping, ModelCheckpoint, CSVLogger
 
 INPUT_SHAPE = (416, 416)
-BATCH_SIZE = 8
 n_classes = 4
 LEARNING_RATE = 1e-3
-EPOCHS = 10
 
 
 def create_dataset(dir_path: str) -> tf.data.Dataset:
@@ -48,23 +49,32 @@ def create_dataset(dir_path: str) -> tf.data.Dataset:
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="Object detection using YoloV3 model.")
+    parser.add_argument("--train_path", type=str, required=True, help="Path to the train dataset.")
+    parser.add_argument("--val_path", type=str, required=True, help="Path to the validation dataset.")
+    parser.add_argument("--batch_size", type=int, required=True, help="Batch size for the training.")
+    parser.add_argument("--epochs", type=int, required=True, help="Number of epochs for the training.")
+    args = parser.parse_args()
+
+    batch_size = args.batch_size
+    n_epochs = args.epochs
 
     project_dir = Path(__file__).parent.parent
 
     # Paths to data directories
-    train_path = os.path.join(project_dir, "dataset\\Train")
-    val_path = os.path.join(project_dir, "dataset\\Val")
+    train_path = os.path.join(project_dir, args.train_path)
+    val_path = os.path.join(project_dir, args.val_path)
 
     train_dataset = create_dataset(train_path)
     val_dataset = create_dataset(val_path)
 
     train_dataset = train_dataset.shuffle(buffer_size=512)
-    train_dataset = train_dataset.batch(batch_size=BATCH_SIZE)
+    train_dataset = train_dataset.batch(batch_size=batch_size)
     train_dataset = train_dataset.map(
         lambda x, y: (x, transform_targets(y, INPUT_SHAPE, ANCHORS, ANCHOR_MASKS, n_classes)))
     train_dataset = train_dataset.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
 
-    val_dataset = val_dataset.batch(batch_size=BATCH_SIZE)
+    val_dataset = val_dataset.batch(batch_size=batch_size)
     val_dataset = val_dataset.map(
         lambda x, y: (x, transform_targets(y, INPUT_SHAPE, ANCHORS, ANCHOR_MASKS, n_classes)))
 
@@ -91,7 +101,7 @@ if __name__ == '__main__':
         DataVisualizer(val_dataset, result_dir='train_results')
     ]
 
-    history = model.fit(train_dataset, epochs=EPOCHS, callbacks=callbacks, validation_data=val_dataset, verbose=True)
+    history = model.fit(train_dataset, epochs=n_epochs, callbacks=callbacks, validation_data=val_dataset, verbose=True)
     model.save(f"YoloV3_{INPUT_SHAPE[0]}x{INPUT_SHAPE[1]}.h5")
 
 
