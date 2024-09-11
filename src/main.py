@@ -43,7 +43,7 @@ def create_dataset(dir_path: str) -> tf.data.Dataset:
 
     dataset = tf.data.Dataset.zip((img_dataset, labels_dataset))
 
-    dataset = dataset.map(lambda x, y: tf_transform_imgs_labels(x, y))
+    dataset = dataset.map(lambda x, y: tf_transform_imgs_labels(x, y, INPUT_SHAPE))
 
     return dataset
 

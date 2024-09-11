@@ -1,11 +1,10 @@
+from typing import Tuple
+
 import numpy as np
 import tensorflow as tf
 
 from src.utils import preprocess_image
 
-
-INPUT_SHAPE = (416, 416)
-BATCH_SIZE = 8
 MAX_BOXES = 100
 
 @tf.function
@@ -79,11 +78,15 @@ def transform_targets(y_train, size, anchors, anchor_masks, classes):
     return tuple(y_outs)
 
 
-def transform_img_and_labels(image_path_tensor: tf.Tensor, label_path_tensor: tf.Tensor):
+def transform_img_and_labels(
+        image_path_tensor: tf.Tensor,
+        label_path_tensor: tf.Tensor,
+        input_shape: Tuple[int, int]
+):
     image_path = bytes.decode(image_path_tensor.numpy())
     label_path = bytes.decode(label_path_tensor.numpy())
 
-    orig_image, image_normalized = preprocess_image(image_path=image_path, input_shape=INPUT_SHAPE)
+    orig_image, image_normalized = preprocess_image(image_path=image_path, input_shape=input_shape)
     image_normalized = tf.convert_to_tensor(image_normalized, dtype=tf.float32)
 
     with open(label_path, 'r') as file:
@@ -113,8 +116,8 @@ def transform_img_and_labels(image_path_tensor: tf.Tensor, label_path_tensor: tf
             processed_label_data = np.pad(processed_label_data, paddings, mode='constant')
             label_tensor = tf.convert_to_tensor(processed_label_data, dtype=tf.float32)
             # Adjust bounding boxes
-            scale_x = INPUT_SHAPE[1] / orig_image.shape[1]
-            scale_y = INPUT_SHAPE[0] / orig_image.shape[0]
+            scale_x = input_shape[1] / orig_image.shape[1]
+            scale_y = input_shape[0] / orig_image.shape[0]
 
             transformed_label_tensor = label_tensor * tf.constant(
                 [scale_x, scale_y, scale_x, scale_y, 1], dtype=tf.float32
@@ -125,13 +128,17 @@ def transform_img_and_labels(image_path_tensor: tf.Tensor, label_path_tensor: tf
 
     return image_normalized, transformed_label_tensor
 
-def tf_transform_imgs_labels(image_path_tensor: tf.Tensor, label_path_tensor: tf.Tensor):
+def tf_transform_imgs_labels(
+        image_path_tensor: tf.Tensor,
+        label_path_tensor: tf.Tensor,
+        input_shape: Tuple[int, int]
+):
     img, label = tf.py_function(
         func=transform_img_and_labels,
-        inp=[image_path_tensor, label_path_tensor],
+        inp=[image_path_tensor, label_path_tensor, input_shape],
         Tout=[tf.float32, tf.float32]
     )
-    img.set_shape([INPUT_SHAPE[0], INPUT_SHAPE[1], 3])
+    img.set_shape([input_shape[0], input_shape[1], 3])
     label.set_shape([MAX_BOXES, 5])
     return img, label
 
